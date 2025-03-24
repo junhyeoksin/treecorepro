@@ -1,0 +1,47 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: keystrom-backend-core
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:keystrom;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+        enable_lazy_load_no_trans: true
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+          use_structured_entries: true
+        generate_statistics: true
+  cache:
+    ehcache:
+      config: classpath:ehcache.xml
+  main:
+    allow-bean-definition-overriding: true
+
+logging:
+  level:
+    root: INFO
+    com.keystrom: DEBUG
+    org.hibernate:
+      SQL: DEBUG
+      type.descriptor.sql.BasicBinder: TRACE
+      cache: DEBUG

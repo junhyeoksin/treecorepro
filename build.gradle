@@ -1,0 +1,92 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.7.18'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'maven-publish'
+    id 'io.freefair.lombok' version '8.6'
+}
+
+group = 'com.treecore'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.18'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.18'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc:2.7.18'
+    
+    // Hibernate
+    implementation 'org.hibernate:hibernate-core:5.6.15.Final'
+    implementation 'org.hibernate:hibernate-ehcache:5.6.15.Final'
+    
+    // Database
+    runtimeOnly 'com.h2database:h2:2.1.214'
+    
+    // Web & API
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'javax.persistence:javax.persistence-api:2.2'
+    implementation 'javax.transaction:javax.transaction-api:1.3'
+    
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+    
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.18'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+test {
+    useJUnitPlatform()
+    
+    // 단위 테스트와 통합 테스트 분리
+    filter {
+        // 단위 테스트만 포함
+        includeTestsMatching "*ServiceTest"
+        excludeTestsMatching "*ControllerTest"
+        excludeTestsMatching "*DaoTest"
+        excludeTestsMatching "*ApplicationTests"
+    }
+}
+
+// TreeNodeDaoTest를 제외한 통합 테스트 설정
+task integrationTest(type: Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+    
+    useJUnitPlatform()
+    
+    // TreeNodeDaoTest 제외
+    exclude '**/TreeNodeDaoTest.class'
+    
+    // 통합 테스트 설정
+    systemProperty 'spring.profiles.active', 'test'
+    
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    
+    reports {
+        html.required = true
+    }
+    
+    // 테스트 실패 시에도 계속 실행
+    mustRunAfter test
+}
+
+// check 태스크에 integrationTest 추가
+check {
+    dependsOn integrationTest
+} 

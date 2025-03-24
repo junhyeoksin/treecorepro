@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false">
+
+    <diskStore path="java.io.tmpdir"/>
+
+    <!-- Default Cache 설정 -->
+    <defaultCache
+            eternal="false"
+            maxElementsInMemory="1000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            timeToIdleSeconds="0"
+            timeToLiveSeconds="600"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <!-- TreeNode 엔티티 캐시 설정 -->
+    <cache name="com.treecore.pro.model.TreeNode"
+           eternal="false"
+           maxElementsInMemory="5000"
+           overflowToDisk="false"
+           diskPersistent="false"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="600"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <!-- 쿼리 캐시 설정 -->
+    <cache name="org.hibernate.cache.internal.StandardQueryCache"
+           eternal="false"
+           maxElementsInMemory="500"
+           overflowToDisk="false"
+           diskPersistent="false"
+           timeToIdleSeconds="0"
+           timeToLiveSeconds="300"
+           memoryStoreEvictionPolicy="LRU"/>
+    
+    <!-- 타임스탬프 캐시 설정 -->
+    <cache name="org.hibernate.cache.spi.UpdateTimestampsCache"
+           eternal="true"
+           maxElementsInMemory="5000"
+           overflowToDisk="true"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+</ehcache> 
