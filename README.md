@@ -21,6 +21,55 @@ Tree Core Pro는 계층적 데이터 구조를 효율적으로 관리하고 조�
 - H2 데이터베이스 (개발용)
 - Gradle
 
+## Nested Set Model 활용
+
+이 프로젝트는 계층적 데이터를 효율적으로 저장하고 조회하기 위해 Nested Set Model을 사용합니다:
+
+### Nested Set Model이란?
+
+Nested Set Model은 계층 구조 데이터를 관계형 데이터베이스에 효율적으로 저장하기 위한 기법입니다. 각 노드는 `left`와 `right` 값을 가지며, 이 값들로 노드 간의 계층 관계를 표현합니다.
+
+### 구현 방식
+
+`TreeNode` 엔티티에서 Nested Set Model을 구현하는 주요 필드들:
+
+```java
+@Column(name = "c_left")
+private Long c_left;
+
+@Column(name = "c_right")
+private Long c_right;
+
+@Column(name = "c_level")
+private Integer c_level;
+
+@Column(name = "c_parentid")
+private Long c_parentid;
+```
+
+### Nested Set Model의 장점
+
+1. **효율적인 하위 트리 검색**: 특정 노드의 모든 하위 노드를 단일 쿼리로 검색 가능
+   ```sql
+   SELECT * FROM tree_node WHERE c_left > node.c_left AND c_right < node.c_right
+   ```
+
+2. **계층 구조 보존**: left와 right 값으로 트리의 구조를 정확히 표현
+
+3. **경로 탐색 최적화**: 특정 노드에서 루트까지의 경로를 효율적으로 찾기 가능
+   ```sql
+   SELECT * FROM tree_node WHERE c_left < node.c_left AND c_right > node.c_right
+   ```
+
+4. **순서 유지**: 트리 내 노드의 순서가 자연스럽게 유지됨
+
+### 구현 특징
+
+- **부모 ID 추가 사용**: 직접적인 부모 접근을 위한 `c_parentid` 필드 활용
+- **레벨 정보 저장**: 노드 깊이를 직접 저장하여 트리 구조 파악 용이
+- **트랜잭션 관리**: 노드 조작 시 데이터 일관성 유지를 위한 트랜잭션 처리
+- **캐싱 전략**: 자주 접근하는 트리 구조에 대한 캐싱으로 성능 최적화
+
 ## Hibernate 및 JPA 활용
 
 이 프로젝트는 다양한 방식으로 Hibernate와 JPA를 활용합니다:
