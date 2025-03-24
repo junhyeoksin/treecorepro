@@ -21,6 +21,87 @@ Tree Core Pro는 계층적 데이터 구조를 효율적으로 관리하고 조�
 - H2 데이터베이스 (개발용)
 - Gradle
 
+## Hibernate 및 JPA 활용
+
+이 프로젝트는 다양한 방식으로 Hibernate와 JPA를 활용합니다:
+
+### 1. 엔티티 정의 (JPA 애노테이션 사용)
+`TreeNode.java` 클래스는 JPA 애노테이션을 사용하여 데이터베이스 테이블과 매핑됩니다:
+```java
+@Entity
+@Table(name = "tree_node")
+@DynamicUpdate
+@DynamicInsert
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class TreeNode implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TreeNodeSequence")
+    @Column(name = "c_id")
+    private Long c_id;
+    
+    // 다른 필드들...
+}
+```
+
+### 2. Hibernate 고유 기능 활용
+프로젝트는 Hibernate 고유 애노테이션도 사용합니다:
+- `@DynamicUpdate`: 변경된 필드만 업데이트
+- `@DynamicInsert`: NULL이 아닌 필드만 삽입
+- `@Cache`: 두 번째 레벨 캐시 활성화
+
+### 3. Hibernate 설정
+`HibernateConfig` 클래스는 다음과 같은 설정을 담당합니다:
+- SessionFactory 설정
+- 트랜잭션 관리
+- Hibernate 속성 구성
+- 캐시 설정
+- 쿼리 인터셉터 구성
+
+### 4. DAO 레이어 (데이터 접근 계층)
+`AbstractHibernateDao` 클래스는 Hibernate 기반 데이터 접근 패턴을 구현합니다:
+- Hibernate의 `Session`을 사용한 CRUD 작업
+- JPA의 Criteria API를 활용한 타입 안전 쿼리
+- 대량 업데이트, 일괄 삽입 등의 고급 기능 지원
+
+### 5. 캐싱 전략
+성능 향상을 위해 Hibernate의 캐싱 기능을 활용합니다:
+- EhCache를 캐시 제공자로 사용
+- 2차 캐시 및 쿼리 캐시 활성화
+- 자주 액세스하는 엔티티와 쿼리 결과 캐싱
+
+### 6. 계층적 데이터 관리
+트리 구조 데이터를 효율적으로 관리하기 위한 필드 설계:
+```java
+@Column(name = "c_parentid")
+private Long c_parentid;
+
+@Column(name = "c_left")
+private Long c_left;
+
+@Column(name = "c_right")
+private Long c_right;
+
+@Column(name = "c_level")
+private Integer c_level;
+```
+
+### 7. application.yml 설정
+```yaml
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+```
+
 ## 시작하기
 
 ### 요구사항
