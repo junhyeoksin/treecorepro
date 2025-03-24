@@ -180,15 +180,132 @@ spring:
    - API 엔드포인트: http://localhost:8080
    - H2 콘솔: http://localhost:8080/h2-console
 
+## 사용 방법
+
+Tree Core Pro는 RESTful API를 통해 트리 구조 데이터를 관리합니다. 다음은 주요 기능별 사용 방법입니다.
+
+### 1. 트리 노드 기본 작업
+
+#### 루트 노드 생성
+```bash
+# 루트 노드 생성
+curl -X POST "http://localhost:8080/api/nodes/root?title=루트노드" -H "Content-Type: application/json"
+```
+
+#### 노드 조회
+```bash
+# 모든 노드 조회
+curl -X GET "http://localhost:8080/api/nodes"
+
+# 특정 ID의 노드 조회
+curl -X GET "http://localhost:8080/api/nodes/1"
+```
+
+#### 노드 생성 및 수정
+```bash
+# 새 노드 생성
+curl -X POST "http://localhost:8080/api/nodes" -H "Content-Type: application/json" -d '{"c_title":"새 노드", "c_type":"default"}'
+
+# 특정 노드 업데이트
+curl -X PUT "http://localhost:8080/api/nodes/2" -H "Content-Type: application/json" -d '{"c_title":"업데이트된 노드"}'
+```
+
+#### 노드 삭제
+```bash
+# 노드 삭제
+curl -X DELETE "http://localhost:8080/api/nodes/3"
+```
+
+### 2. 계층 구조 관리
+
+#### 자식 노드 작업
+```bash
+# 자식 노드 조회
+curl -X GET "http://localhost:8080/api/nodes/children/1"
+
+# 자식 노드 추가
+curl -X POST "http://localhost:8080/api/nodes/children/1" -H "Content-Type: application/json" -d '{"c_title":"자식 노드", "c_type":"default"}'
+```
+
+#### 트리 구조 조작
+```bash
+# 노드 이동
+curl -X PUT "http://localhost:8080/api/nodes/2/move?newParentId=4&position=last"
+
+# 노드 복사
+curl -X POST "http://localhost:8080/api/nodes/2/copy?targetParentId=1&position=first"
+```
+
+### 3. 트리 탐색
+
+#### 자손 및 조상 조회
+```bash
+# 노드의 모든 자손 조회
+curl -X GET "http://localhost:8080/api/nodes/1/descendants"
+
+# 노드의 모든 조상 조회
+curl -X GET "http://localhost:8080/api/nodes/5/ancestors"
+```
+
+#### 검색 기능
+```bash
+# 제목으로 노드 검색
+curl -X GET "http://localhost:8080/api/nodes/search?title=검색어"
+```
+
+### 4. 응답 형식
+
+모든 API 응답은 JSON 형식으로 제공됩니다. 노드 객체의 기본 구조는 다음과 같습니다:
+
+```json
+{
+  "c_id": 1,
+  "c_parentid": 0,
+  "c_position": "0",
+  "c_left": 1,
+  "c_right": 2,
+  "c_level": 0,
+  "c_title": "루트 노드",
+  "c_type": "default",
+  "c_insdate": "2023-01-01T00:00:00"
+}
+```
+
+### 5. H2 콘솔 사용
+
+개발 환경에서는 H2 인메모리 데이터베이스를 사용합니다. 다음 단계를 통해 데이터베이스를 직접 확인할 수 있습니다:
+
+1. 브라우저에서 http://localhost:8080/h2-console 접속
+2. JDBC URL: `jdbc:h2:mem:keystrom` 입력
+3. 사용자명: `sa` (비밀번호는 비워둠)
+4. '연결' 버튼 클릭
+
+### 6. 오류 처리
+
+API 응답은 표준 HTTP 상태 코드를 사용합니다:
+- 200: 성공
+- 201: 리소스 생성 성공
+- 400: 잘못된 요청
+- 404: 리소스를 찾을 수 없음
+- 500: 서버 오류
+
 ## API 문서
 
 주요 API 엔드포인트:
 
-- `GET /api/treeNode`: 모든 트리 노드 조회
-- `GET /api/treeNode/{id}`: 특정 ID의 트리 노드 조회
-- `POST /api/treeNode`: 새 트리 노드 생성
-- `PUT /api/treeNode/{id}`: 특정 ID의 트리 노드 업데이트
-- `DELETE /api/treeNode/{id}`: 특정 ID의 트리 노드 삭제
+- `GET /api/nodes`: 모든 트리 노드 조회
+- `GET /api/nodes/{id}`: 특정 ID의 트리 노드 조회
+- `POST /api/nodes`: 새 트리 노드 생성
+- `PUT /api/nodes/{id}`: 특정 ID의 트리 노드 업데이트
+- `DELETE /api/nodes/{id}`: 특정 ID의 트리 노드 삭제
+- `GET /api/nodes/children/{parentId}`: 특정 부모 노드의 자식 노드 조회
+- `POST /api/nodes/children/{parentId}`: 특정 부모 노드에 자식 노드 추가
+- `GET /api/nodes/search`: 제목으로 노드 검색
+- `POST /api/nodes/root`: 루트 노드 생성
+- `PUT /api/nodes/{id}/move`: 노드 이동
+- `POST /api/nodes/{id}/copy`: 노드 복사
+- `GET /api/nodes/{id}/descendants`: 특정 노드의 모든 자손 조회
+- `GET /api/nodes/{id}/ancestors`: 특정 노드의 모든 조상 조회
 
 ## 개발 및 디버깅
 
